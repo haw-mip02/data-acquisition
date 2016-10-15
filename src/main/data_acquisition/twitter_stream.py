@@ -34,10 +34,11 @@ class ThreadSafeList():
 class TweetListener(StreamListener):
     def __init__(self):
         self.tweet_list = ThreadSafeList()
+        self.tweet_threshold = sys.argv[5]
 
     def on_data(self, data):
         self.tweet_list.append(data)
-        if (self.tweet_list.length() > 2):
+        if (self.tweet_list.length() > self.tweet_threshold):
             tweet_list = self.tweet_list.flush_and_return_all()
             # TODO: send data to database
             print(tweet_list)
