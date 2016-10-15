@@ -1,12 +1,8 @@
+import sys
 from threading import Lock
 
 import tweepy
 from tweepy.streaming import StreamListener
-
-consumer_key = ""
-consumer_secret = ""
-access_token = ""
-access_token_secret = ""
 
 
 class ThreadSafeList():
@@ -51,6 +47,10 @@ class TweetListener(StreamListener):
         print(status)
 
 if __name__ == '__main__':
+    consumer_key = sys.argv[1]
+    consumer_secret = sys.argv[2]
+    access_token = sys.argv[3]
+    access_token_secret = sys.argv[4]
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
