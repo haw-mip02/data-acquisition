@@ -5,4 +5,3 @@ services:
 
 script:
   - docker build -t data_acquisition .
-  - docker compose
