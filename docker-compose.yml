@@ -6,3 +6,4 @@ data_acquisition:
     CONSUMER_SECRET: ""
     ACCESS_TOKEN: ""
     ACCESS_TOKEN_SECRET: ""
+    DATABASE_REST_URL: ""

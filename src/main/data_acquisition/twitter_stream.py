@@ -1,6 +1,8 @@
+import json
 import sys
 from threading import Lock
 
+import requests
 import tweepy
 from tweepy.streaming import StreamListener
 
@@ -19,7 +21,6 @@ class ThreadSafeList():
             self.list.append(item)
         finally:
             self.edit_mutex.release()
-        print("item appended, list is" + str(self.list))
 
     def flush_and_return_all(self):
         self.edit_mutex.acquire()
@@ -35,17 +36,23 @@ class TweetListener(StreamListener):
     def __init__(self):
         self.tweet_list = ThreadSafeList()
         self.tweet_threshold = sys.argv[5]
+        self.database_rest_url = sys.argv[6]
 
     def on_data(self, data):
         self.tweet_list.append(data)
-        if (self.tweet_list.length() > self.tweet_threshold):
+        if self.tweet_list.length() > self.tweet_threshold:
             tweet_list = self.tweet_list.flush_and_return_all()
-            # TODO: send data to database
-            print(tweet_list)
+            self.send_data(tweet_list)
         return True
 
     def on_error(self, status):
         print(status)
+
+    def send_data(self, data):
+        data_json = json.dumps(data)
+        url = self.database_rest_url.rstrip('/') + '/tweets'
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, data=data_json, headers=headers)
 
 if __name__ == '__main__':
     consumer_key = sys.argv[1]
