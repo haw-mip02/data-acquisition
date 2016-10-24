@@ -1,10 +1,8 @@
 sudo: required
 
-language: Python
-
 services:
   - docker
 
-install:
-  - docker build  - < Dockerfile -t data_acquisition
+script:
+  - docker build -t data_acquisition
   - docker compose
