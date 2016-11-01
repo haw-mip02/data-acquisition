@@ -19,8 +19,6 @@ class ThreadSafeList():
         self.edit_mutex.acquire()
         try:
             self.list.append(item)
-			    if len(sys.argv) > 7:
-			        print(item)
         finally:
             self.edit_mutex.release()
 
@@ -42,6 +40,8 @@ class TweetListener(StreamListener):
 
     def on_data(self, data):
         self.tweet_list.append(data)
+        if len(sys.argv) > 7:
+			        print(data)
         if self.tweet_list.length() > self.tweet_threshold:
             tweet_list = self.tweet_list.flush_and_return_all()
             self.send_data(tweet_list)
