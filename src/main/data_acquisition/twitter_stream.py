@@ -13,7 +13,12 @@ class ThreadSafeList():
         self.edit_mutex = Lock()
 
     def length(self):
-        return len(self.list)
+        self.edit_mutex.acquire()
+        try:
+            result = len(self.list)
+        finally:
+            self.edit_mutex.release()
+        return result
 
     def append(self, item):
         self.edit_mutex.acquire()
@@ -46,7 +51,7 @@ class TweetListener(StreamListener):
             tweet_list = self.tweet_list.flush_and_return_all()
             if debugging:
                 print('send tweet-list to persistency: {}'.format(json.dumps(tweet_list)))
-            self.send_data(tweet_list)
+                # self.send_data(tweet_list)
         return True
 
     def on_error(self, status):
