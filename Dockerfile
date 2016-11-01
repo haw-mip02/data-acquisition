@@ -1,12 +1,7 @@
-FROM ubuntu:16.10
+FROM python:3.6
 
 ENV TWEET_THRESHOLD 20
 ENV DOCKERIZE_VERSION v0.2.0
-
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip curl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 ADD ./src/main/data_acquisition/twitter_stream.py /
 ADD ./docker/config.yml.j2 /
