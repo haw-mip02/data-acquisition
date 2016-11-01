@@ -40,7 +40,7 @@ class ThreadSafeList():
 class TweetListener(StreamListener):
     def __init__(self):
         self.tweet_list = ThreadSafeList()
-        self.tweet_threshold = sys.argv[5]
+        self.tweet_threshold = int(sys.argv[5])
         self.database_rest_url = sys.argv[6]
 
     def on_data(self, data):
@@ -51,7 +51,7 @@ class TweetListener(StreamListener):
             tweet_list = self.tweet_list.flush_and_return_all()
             if debugging:
                 print('send tweet-list to persistency: {}'.format(json.dumps(tweet_list)))
-                # self.send_data(tweet_list)
+                self.send_data(tweet_list)
         return True
 
     def on_error(self, status):
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     access_token = sys.argv[3]
     access_token_secret = sys.argv[4]
     debugging = False
-    if len(sys.argv) > 6:
+    if len(sys.argv) > 7:
         debugging = bool(sys.argv[7])
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
