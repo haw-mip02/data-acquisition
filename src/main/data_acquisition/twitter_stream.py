@@ -39,11 +39,13 @@ class TweetListener(StreamListener):
         self.database_rest_url = sys.argv[6]
 
     def on_data(self, data):
+        if debugging:
+            print('tweet received: {}'.format(str(data)))
         self.tweet_list.append(data)
-        if len(sys.argv) > 7:
-			        print(data)
         if self.tweet_list.length() > self.tweet_threshold:
             tweet_list = self.tweet_list.flush_and_return_all()
+            if debugging:
+                print('send tweet-list to persistency: {}'.format(json.dumps(tweet_list)))
             self.send_data(tweet_list)
         return True
 
@@ -55,12 +57,17 @@ class TweetListener(StreamListener):
         url = self.database_rest_url.rstrip('/') + '/tweets'
         headers = {'Content-Type': 'application/json'}
         response = requests.post(url, data=data_json, headers=headers)
+        if debugging:
+            print('sent tweet-list to persistency with response: {}'.format(str(response)))
 
 if __name__ == '__main__':
     consumer_key = sys.argv[1]
     consumer_secret = sys.argv[2]
     access_token = sys.argv[3]
     access_token_secret = sys.argv[4]
+    debugging = False
+    if sys.argv > 6:
+        debugging = bool(sys.argv[7])
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
