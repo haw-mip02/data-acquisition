@@ -1,0 +1,18 @@
+twitter_credentials:
+  consumer_key: ''
+  consumer_secret: ''
+  access_token: ''
+  access_token_secret: ''
+
+listening_area:
+  upper_right:
+    longitude: 9.391045899999995
+    latitude: 53.11264
+  lower_left:
+    longitude: 11.451602200000025
+    latitude: 53.8979416
+
+
+tweet_threshold: 20
+database_rest_url: http://localhost
+debugging: True

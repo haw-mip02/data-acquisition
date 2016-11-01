@@ -4,6 +4,7 @@ from threading import Lock
 
 import requests
 import tweepy
+import yaml
 from tweepy.streaming import StreamListener
 
 
@@ -68,15 +69,23 @@ class TweetListener(StreamListener):
             print('finished http-request tweet-list to persistency with response: {}'.format(str(response)))
 
 if __name__ == '__main__':
-    consumer_key = sys.argv[1]
-    consumer_secret = sys.argv[2]
-    access_token = sys.argv[3]
-    access_token_secret = sys.argv[4]
-    tweet_threshold = int(sys.argv[5])
-    database_rest_url = sys.argv[6].rstrip('/')
-    debugging = False
-    if len(sys.argv) > 7:
-        debugging = bool(sys.argv[7])
+    path = '../../../config.yml'
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+    config = {}
+    with open(path, 'r') as file:
+        try:
+            config = yaml.load(file)
+        except yaml.YAMLError as exc:
+            print(exc)
+    print('Starting with config: {}'.format(json.dumps(config)))
+    consumer_key = config['twitter_credentials']['consumer_key']
+    consumer_secret = config['twitter_credentials']['consumer_secret']
+    access_token = config['twitter_credentials']['access_token']
+    access_token_secret = config['twitter_credentials']['access_token_secret']
+    tweet_threshold = int(config['tweet_threshold'])
+    database_rest_url = config['database_rest_url'].rstrip('/')
+    debugging = bool(config['debugging'])
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -84,4 +93,9 @@ if __name__ == '__main__':
 
     stream = tweepy.streaming.Stream(api.auth, TweetListener(database_rest_url, tweet_threshold))
 
-    stream.filter(locations=[9.391045899999995, 53.11264, 11.451602200000025, 53.8979416], async=True)
+    up_right_longitude = config['listening_area']['upper_right']['longitude']
+    up_right_latitude = config['listening_area']['upper_right']['latitude']
+    down_left_longitude = config['listening_area']['lower_left']['longitude']
+    down_left_latitude = config['listening_area']['lower_left']['latitude']
+    stream.filter(locations=[up_right_longitude, up_right_latitude, down_left_longitude, down_left_latitude],
+                  async=True)
