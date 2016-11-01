@@ -38,10 +38,10 @@ class ThreadSafeList():
 
 
 class TweetListener(StreamListener):
-    def __init__(self):
+    def __init__(self, database_rest_url, tweet_threshold):
         self.tweet_list = ThreadSafeList()
-        self.tweet_threshold = int(sys.argv[5])
-        self.database_rest_url = sys.argv[6]
+        self.tweet_threshold = tweet_threshold
+        self.database_rest_url = database_rest_url
 
     def on_data(self, data):
         if debugging:
@@ -51,25 +51,29 @@ class TweetListener(StreamListener):
             tweet_list = self.tweet_list.flush_and_return_all()
             if debugging:
                 print('send tweet-list to persistency: {}'.format(json.dumps(tweet_list)))
-                self.send_data(tweet_list)
+            self.send_data(tweet_list)
         return True
 
     def on_error(self, status):
-        print(status)
+        print('TweetListener had a error: {}'.format(status))
 
     def send_data(self, data):
+        if debugging:
+            print('started http-request to persistency with tweet-list: {}'.format(str(data)))
         data_json = json.dumps(data)
         url = self.database_rest_url.rstrip('/') + '/tweets'
         headers = {'Content-Type': 'application/json'}
         response = requests.post(url, data=data_json, headers=headers)
         if debugging:
-            print('sent tweet-list to persistency with response: {}'.format(str(response)))
+            print('finished http-request tweet-list to persistency with response: {}'.format(str(response)))
 
 if __name__ == '__main__':
     consumer_key = sys.argv[1]
     consumer_secret = sys.argv[2]
     access_token = sys.argv[3]
     access_token_secret = sys.argv[4]
+    tweet_threshold = int(sys.argv[5])
+    database_rest_url = sys.argv[6].rstrip('/')
     debugging = False
     if len(sys.argv) > 7:
         debugging = bool(sys.argv[7])
@@ -78,6 +82,6 @@ if __name__ == '__main__':
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
 
-    stream = tweepy.streaming.Stream(api.auth, TweetListener())
+    stream = tweepy.streaming.Stream(api.auth, TweetListener(database_rest_url, tweet_threshold))
 
     stream.filter(locations=[9.391045899999995, 53.11264, 11.451602200000025, 53.8979416], async=True)
