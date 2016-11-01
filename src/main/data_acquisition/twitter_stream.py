@@ -19,8 +19,8 @@ class ThreadSafeList():
         self.edit_mutex.acquire()
         try:
             self.list.append(item)
-			if len(sys.argv) == 7:
-				print(item)
+			    if len(sys.argv) > 7:
+			        print(item)
         finally:
             self.edit_mutex.release()
 
