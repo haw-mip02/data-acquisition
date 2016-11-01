@@ -93,9 +93,9 @@ if __name__ == '__main__':
 
     stream = tweepy.streaming.Stream(api.auth, TweetListener(database_rest_url, tweet_threshold))
 
-    up_right_longitude = config['listening_area']['upper_right']['longitude']
-    up_right_latitude = config['listening_area']['upper_right']['latitude']
-    down_left_longitude = config['listening_area']['lower_left']['longitude']
-    down_left_latitude = config['listening_area']['lower_left']['latitude']
-    stream.filter(locations=[up_right_longitude, up_right_latitude, down_left_longitude, down_left_latitude],
+    upper_right_longitude = float(config['listening_area']['upper_right']['longitude'])
+    upper_right_latitude = float(config['listening_area']['upper_right']['latitude'])
+    lower_left_longitude = float(config['listening_area']['lower_left']['longitude'])
+    lower_left_latitude = float(config['listening_area']['lower_left']['latitude'])
+    stream.filter(locations=[upper_right_longitude, upper_right_latitude, lower_left_longitude, lower_left_latitude],
                   async=True)
