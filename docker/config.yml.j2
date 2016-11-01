@@ -14,5 +14,5 @@ listening_area:
 
 
 tweet_threshold: {{ default .Env.TWEET_THRESHOLD "20" }}
-database_rest_url: http://{{ default .Env.REST_PORT_3000_TCP_ADDR "localhost" }}:{{ default .Env.REST_PORT_3000_TCP_PORT "80" }}
+database_rest_url: {{ default .Env.DATABASE_REST_URL "localhost:80" }}
 debugging: {{ default .Env.DEBUGGING "True" }}
