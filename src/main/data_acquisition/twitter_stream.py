@@ -66,7 +66,7 @@ if __name__ == '__main__':
     access_token = sys.argv[3]
     access_token_secret = sys.argv[4]
     debugging = False
-    if sys.argv > 6:
+    if len(sys.argv) > 6:
         debugging = bool(sys.argv[7])
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
