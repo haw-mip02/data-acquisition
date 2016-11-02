@@ -12,7 +12,6 @@ listening_area:
     longitude: {{ default .Env.LOWER_LEFT_LONGITUDE "11.451602200000025" }}
     latitude: {{ default .Env.LOWER_LEFT_LATITUDE "53.8979416" }}
 
-
 tweet_threshold: {{ default .Env.TWEET_THRESHOLD "20" }}
-database_rest_url: {{ default .Env.DATABASE_REST_URL "localhost:80" }}
+database_rest_url: "{{ default .Env.DATABASE_REST_URL "http://localhost:80" }}"
 debugging: {{ default .Env.DEBUGGING "True" }}
