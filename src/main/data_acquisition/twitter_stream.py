@@ -8,6 +8,11 @@ import yaml
 from tweepy.streaming import StreamListener
 
 
+def debug_print(message):
+    if debugging:
+        print(message)
+
+
 class ThreadSafeList():
     def __init__(self):
         self.list = []
@@ -45,13 +50,11 @@ class TweetListener(StreamListener):
         self.database_rest_url = database_rest_url
 
     def on_data(self, data):
-        if debugging:
-            print('tweet received: {}'.format(str(data)))
-        self.tweet_list.append(data)
+        debug_print('tweet received: {}'.format(str(data)))
+        self.tweet_list.append(json.loads(data))
         if self.tweet_list.length() >= self.tweet_threshold:
             tweet_list = self.tweet_list.flush_and_return_all()
-            if debugging:
-                print('send tweet-list to persistency: {}'.format(json.dumps(tweet_list)))
+            debug_print('send tweet-list to persistency: {}'.format(json.dumps(tweet_list)))
             self.send_data(tweet_list)
         return True
 
@@ -59,17 +62,15 @@ class TweetListener(StreamListener):
         print('TweetListener had a error: {}'.format(status))
 
     def send_data(self, data):
-        # tweets in data are already json-strings, so simply concat them into list
-        payload = '['
-        for tweet in data:
-            payload += tweet + ','
-        payload = payload.rstrip(',') + ']'
-        if debugging:
-            print('started http-request to persistency with tweet-list: {}'.format(payload))
-        headers = {'Content-Type': 'application/json'}
-        response = requests.post(self.database_rest_url + '/tweets', data=payload, headers=headers)
-        if debugging:
-            print('finished http-request tweet-list to persistency with response: {} : {}'.format(str(response), response.text))
+        if data:
+            # tweets in data are already json-strings, so simply concat them into list
+            payload = json.dumps(data)
+            url = self.database_rest_url + '/tweets'
+            debug_print('started http-request to persistency with tweet-list: {}'.format(payload))
+            headers = {'Content-Type': 'application/json'}
+            response = requests.post(url, data=payload, headers=headers)
+            debug_print('finished http-request tweet-list to persistency with response: {} : {}'.format(str(response),
+                                                                                                        response.text))
 
 if __name__ == '__main__':
     path = '../../../config.yml'
