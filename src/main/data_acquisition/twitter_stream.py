@@ -48,7 +48,7 @@ class TweetListener(StreamListener):
         if debugging:
             print('tweet received: {}'.format(str(data)))
         self.tweet_list.append(data)
-        if self.tweet_list.length() > self.tweet_threshold:
+        if self.tweet_list.length() >= self.tweet_threshold:
             tweet_list = self.tweet_list.flush_and_return_all()
             if debugging:
                 print('send tweet-list to persistency: {}'.format(json.dumps(tweet_list)))
@@ -59,14 +59,17 @@ class TweetListener(StreamListener):
         print('TweetListener had a error: {}'.format(status))
 
     def send_data(self, data):
+        # tweets in data are already json-strings, so simply concat them into list
+        payload = '['
+        for tweet in data:
+            payload += tweet + ','
+        payload = payload.rstrip(',') + ']'
         if debugging:
-            print('started http-request to persistency with tweet-list: {}'.format(str(data)))
-        data_json = json.dumps(data)
-        url = self.database_rest_url.rstrip('/') + '/tweets'
+            print('started http-request to persistency with tweet-list: {}'.format(payload))
         headers = {'Content-Type': 'application/json'}
-        response = requests.post(url, data=data_json, headers=headers)
+        response = requests.post(self.database_rest_url + '/tweets', data=payload, headers=headers)
         if debugging:
-            print('finished http-request tweet-list to persistency with response: {}'.format(str(response)))
+            print('finished http-request tweet-list to persistency with response: {} : {}'.format(str(response), response.text))
 
 if __name__ == '__main__':
     path = '../../../config.yml'
