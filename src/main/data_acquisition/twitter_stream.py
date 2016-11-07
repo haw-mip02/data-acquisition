@@ -110,5 +110,5 @@ if __name__ == '__main__':
     upper_right_latitude = float(config['listening_area']['upper_right']['latitude'])
     lower_left_longitude = float(config['listening_area']['lower_left']['longitude'])
     lower_left_latitude = float(config['listening_area']['lower_left']['latitude'])
-    stream.filter(locations=[upper_right_longitude, upper_right_latitude, lower_left_longitude, lower_left_latitude],
+    stream.filter(locations=[lower_left_longitude, lower_left_latitude, upper_right_longitude, upper_right_latitude],
                   async=True)
