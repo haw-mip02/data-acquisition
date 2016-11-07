@@ -1,6 +1,5 @@
 FROM python:3.6
 
-ENV TWEET_THRESHOLD 20
 ENV DOCKERIZE_VERSION v0.2.0
 
 ADD ./docker/run.sh /

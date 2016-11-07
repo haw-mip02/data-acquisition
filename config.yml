@@ -16,3 +16,4 @@ listening_area:
 tweet_threshold: 20
 database_rest_url: http://localhost
 debugging: True
+dry_run: False

@@ -13,10 +13,16 @@ def debug_print(message):
         print(message)
 
 
+def dry_run_print(message):
+    if dry_run:
+        print(message)
+
+
 class ThreadSafeList():
     def __init__(self):
         self.list = []
         self.edit_mutex = Lock()
+        self.counter = 0
 
     def length(self):
         self.edit_mutex.acquire()
@@ -30,6 +36,8 @@ class ThreadSafeList():
         self.edit_mutex.acquire()
         try:
             self.list.append(item)
+            dry_run_print('added tweet no {}'.format(self.counter))
+            self.counter += 1
         finally:
             self.edit_mutex.release()
 
@@ -62,7 +70,7 @@ class TweetListener(StreamListener):
         print('TweetListener had a error: {}'.format(status))
 
     def send_data(self, data):
-        if data:
+        if data and not dry_run:
             # tweets in data are already json-strings, so simply concat them into list
             payload = json.dumps(data)
             url = self.database_rest_url + '/tweets'
@@ -90,6 +98,7 @@ if __name__ == '__main__':
     tweet_threshold = int(config['tweet_threshold'])
     database_rest_url = config['database_rest_url'].rstrip('/')
     debugging = bool(config['debugging'])
+    dry_run = bool(config['dry_run'])
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
