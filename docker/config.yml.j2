@@ -6,13 +6,13 @@ twitter_credentials:
 
 listening_area:
   upper_right:
-    longitude: {{ default .Env.UPPER_RIGHT_LONGITUDE "9.391045899999995" }}
-    latitude: {{ default .Env.UPPER_RIGHT_LATITUDE "53.11264" }}
+    longitude: {{ default .Env.UPPER_RIGHT_LONGITUDE "11.451602200000025" }}
+    latitude: {{ default .Env.UPPER_RIGHT_LATITUDE "53.8979416" }}
   lower_left:
-    longitude: {{ default .Env.LOWER_LEFT_LONGITUDE "11.451602200000025" }}
-    latitude: {{ default .Env.LOWER_LEFT_LATITUDE "53.8979416" }}
+    longitude: {{ default .Env.LOWER_LEFT_LONGITUDE "9.391045899999995" }}
+    latitude: {{ default .Env.LOWER_LEFT_LATITUDE "53.11264" }}
 
 tweet_threshold: {{ default .Env.TWEET_THRESHOLD "20" }}
 database_rest_url: "{{ default .Env.DATABASE_REST_URL "http://localhost:80" }}"
-debugging: {{ default .Env.DEBUGGING "True" }}
+debugging: {{ default .Env.DEBUGGING "False" }}
 dry_run: {{ default .Env.DRY_RUN "False" }}
