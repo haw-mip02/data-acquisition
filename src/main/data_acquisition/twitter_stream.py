@@ -80,8 +80,8 @@ class TweetListener(StreamListener):
             try:
                 response = requests.post(url, data=payload, headers=headers)
                 debug_print(
-                    'finished http-request tweet-list to persistency with response: {} : {}'.format(str(response),
-                                                                                                        response.text))
+                    'finished sending tweet-list to persistency with response: {} : {}'.format(str(response),
+                                                                                               response.text))
             except:
                 print('ERROR while sending tweet-list to persistency. Traceback is: {}'.format(traceback.format_exc()))
 
