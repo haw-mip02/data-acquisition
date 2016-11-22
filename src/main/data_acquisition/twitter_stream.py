@@ -1,5 +1,6 @@
 import json
 import sys
+import traceback
 from threading import Lock
 
 import requests
@@ -76,9 +77,13 @@ class TweetListener(StreamListener):
             url = self.database_rest_url + '/tweets'
             debug_print('started http-request to persistency with tweet-list: {}'.format(payload))
             headers = {'Content-Type': 'application/json'}
-            response = requests.post(url, data=payload, headers=headers)
-            debug_print('finished http-request tweet-list to persistency with response: {} : {}'.format(str(response),
+            try:
+                response = requests.post(url, data=payload, headers=headers)
+                debug_print(
+                    'finished http-request tweet-list to persistency with response: {} : {}'.format(str(response),
                                                                                                         response.text))
+            except:
+                print('ERROR while sending tweet-list to persistency. Traceback is: {}'.format(traceback.format_exc()))
 
 if __name__ == '__main__':
     path = '../../../config.yml'
