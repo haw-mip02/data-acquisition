@@ -74,7 +74,7 @@ class TweetListener(StreamListener):
         if data and not dry_run:
             # tweets in data are already json-strings, so simply concat them into list
             payload = json.dumps(data)
-            url = self.database_rest_url + '/tweets'
+            url = self.database_rest_url + '/tweets?token=' + db_access_token
             debug_print('started http-request to persistency with tweet-list: {}'.format(payload))
             headers = {'Content-Type': 'application/json'}
             try:
@@ -104,6 +104,7 @@ if __name__ == '__main__':
     database_rest_url = config['database_rest_url'].rstrip('/')
     debugging = bool(config['debugging'])
     dry_run = bool(config['dry_run'])
+    db_access_token = config['db_access_token']
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
