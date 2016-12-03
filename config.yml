@@ -17,3 +17,4 @@ tweet_threshold: 20
 database_rest_url: http://localhost
 debugging: False
 dry_run: False
+db_access_token: superSecret

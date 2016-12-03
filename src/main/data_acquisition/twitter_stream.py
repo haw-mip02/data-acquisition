@@ -1,5 +1,4 @@
 import json
-import os
 import sys
 import traceback
 from threading import Lock
@@ -73,8 +72,6 @@ class TweetListener(StreamListener):
 
     def send_data(self, data):
         if data and not dry_run:
-            # read "API token" from environment variable
-            db_access_token = os.environ['DBT']
             # tweets in data are already json-strings, so simply concat them into list
             payload = json.dumps(data)
             url = self.database_rest_url + '/tweets?token=' + db_access_token
@@ -107,6 +104,7 @@ if __name__ == '__main__':
     database_rest_url = config['database_rest_url'].rstrip('/')
     debugging = bool(config['debugging'])
     dry_run = bool(config['dry_run'])
+    db_access_token = config['db_access_token']
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
