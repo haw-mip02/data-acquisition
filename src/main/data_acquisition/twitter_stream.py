@@ -73,9 +73,13 @@ class TweetListener(StreamListener):
     def send_data(self, data):
         if data and not dry_run:
             # tweets in data are already json-strings, so simply concat them into list
-            payload = json.dumps(data)
-            url = self.database_rest_url + '/tweets?token=' + db_access_token
-            debug_print('started http-request to persistency with tweet-list: {}'.format(payload))
+            data_with_token = {
+                'data': data,
+                'token': db_access_token
+            }
+            payload = json.dumps(data_with_token)
+            url = self.database_rest_url + '/tweets'
+            debug_print('started http-request to persistency with payload: {}'.format(payload))
             headers = {'Content-Type': 'application/json'}
             try:
                 response = requests.post(url, data=payload, headers=headers)
