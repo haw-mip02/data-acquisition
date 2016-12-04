@@ -1,7 +1,9 @@
 import json
 import sys
 import traceback
+from http.client import IncompleteRead
 from threading import Lock
+from threading import Thread
 
 import requests
 import tweepy
@@ -59,16 +61,19 @@ class TweetListener(StreamListener):
         self.database_rest_url = database_rest_url
 
     def on_data(self, data):
+        Thread(target=self.process_incoming_data, args=(data,)).start()
+        return True
+
+    def on_error(self, status):
+        print('TweetListener had a error: {}'.format(status))
+
+    def process_incoming_data(self, data):
         debug_print('tweet received: {}'.format(str(data)))
         self.tweet_list.append(json.loads(data))
         if self.tweet_list.length() >= self.tweet_threshold:
             tweet_list = self.tweet_list.flush_and_return_all()
             debug_print('send tweet-list to persistency: {}'.format(json.dumps(tweet_list)))
             self.send_data(tweet_list)
-        return True
-
-    def on_error(self, status):
-        print('TweetListener had a error: {}'.format(status))
 
     def send_data(self, data):
         if data and not dry_run:
@@ -99,6 +104,8 @@ if __name__ == '__main__':
             config = yaml.load(file)
         except yaml.YAMLError as exc:
             print(exc)
+            print('Error while reading yml-config. Fix it!')
+            exit(1)
     print('Starting with config: {}'.format(json.dumps(config)))
     consumer_key = config['twitter_credentials']['consumer_key']
     consumer_secret = config['twitter_credentials']['consumer_secret']
@@ -114,11 +121,25 @@ if __name__ == '__main__':
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
 
-    stream = tweepy.streaming.Stream(api.auth, TweetListener(database_rest_url, tweet_threshold))
+    while True:
+        try:
+            debug_print('Connecting to Twitter-Stream...')
+            stream = tweepy.streaming.Stream(api.auth, TweetListener(database_rest_url, tweet_threshold))
 
-    upper_right_longitude = float(config['listening_area']['upper_right']['longitude'])
-    upper_right_latitude = float(config['listening_area']['upper_right']['latitude'])
-    lower_left_longitude = float(config['listening_area']['lower_left']['longitude'])
-    lower_left_latitude = float(config['listening_area']['lower_left']['latitude'])
-    stream.filter(locations=[lower_left_longitude, lower_left_latitude, upper_right_longitude, upper_right_latitude],
-                  async=True)
+            upper_right_longitude = float(config['listening_area']['upper_right']['longitude'])
+            upper_right_latitude = float(config['listening_area']['upper_right']['latitude'])
+            lower_left_longitude = float(config['listening_area']['lower_left']['longitude'])
+            lower_left_latitude = float(config['listening_area']['lower_left']['latitude'])
+            stream.filter(
+                locations=[lower_left_longitude, lower_left_latitude, upper_right_longitude, upper_right_latitude])
+        except IncompleteRead:
+            # Oh well, reconnect and keep trucking
+            debug_print('Yeah, I got an IncompleteRead. I will try next time again.')
+            continue
+        except KeyboardInterrupt:
+            # Or however you want to exit this loop
+            stream.disconnect()
+            break
+        except:
+            print('I got a problem, but I will continue. Just for you! {}'.format(traceback.format_exc()))
+            continue
